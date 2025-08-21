@@ -119,7 +119,7 @@ router.post('/', authMiddleware, async (req, res) => {
       // Criar a pasta específica no servidor via SSH no caminho correto
       await SSHManager.createUserFolder(serverId, userLogin, sanitizedName);
       
-      console.log(`✅ Pasta ${sanitizedName} criada no servidor para usuário ${userLogin}`);
+      console.log(\`✅ Pasta ${sanitizedName} criada no servidor para usuário ${userLogin}`);
 
     } catch (sshError) {
       console.error('Erro ao criar pasta no servidor:', sshError);
@@ -130,7 +130,7 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     res.status(201).json({
-      id: `folder_${sanitizedName}_${Date.now()}`, // ID único para a pasta
+      id: \`folder_${sanitizedName}_${Date.now()}`, // ID único para a pasta
       nome: sanitizedName,
       original_name: nome,
       sanitized: sanitizedName !== nome.toLowerCase(),
@@ -150,7 +150,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const folderIdParam = req.params.id;
     const { nome } = req.body;
     const userId = req.user.id;
-    const userLogin = req.user.usuario || req.user.email?.split('@')[0] || `user_${userId}`;
+    const userLogin = req.user.usuario || req.user.email?.split('@')[0] || \`user_${userId}`;
 
     if (!nome) {
       return res.status(400).json({ error: 'Nome da pasta é obrigatório' });
@@ -160,7 +160,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const sanitizedName = VideoURLBuilder.sanitizeFolderName(nome);
     
     if (sanitizedName !== nome.toLowerCase()) {
-      console.log(`📝 Nome da pasta sanitizado: "${nome}" -> "${sanitizedName}"`);
+      console.log(\`📝 Nome da pasta sanitizado: "${nome}" -> "${sanitizedName}"`);
     }
 
     // Extrair nome da pasta atual do ID
@@ -179,6 +179,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     try {
       // Renomear pasta no servidor via SSH
       const oldPath = `/home/streaming/${userLogin}/${oldFolderName}`;
+      )
       const newPath = `/home/streaming/${userLogin}/${sanitizedName}`;
       
       // Verificar se pasta antiga existe
@@ -474,6 +475,18 @@ router.post('/:id/sync', authMiddleware, async (req, res) => {
       });
     } catch (sshError) {
       console.error('Erro na sincronização:', sshError);
+      res.status(500).json({ 
+        error: 'Erro ao sincronizar pasta com servidor',
+        details: sshError.message 
+      });
+    }
+  } catch (err) {
+    console.error('Erro na sincronização da pasta:', err);
+    res.status(500).json({ error: 'Erro na sincronização da pasta', details: err.message });
+  }
+});
+
+module.exports = router;= router;Error);
       res.status(500).json({ 
         error: 'Erro ao sincronizar pasta com servidor',
         details: sshError.message 
